@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload and Display Image with Recognition Result</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin-top: 50px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Image and Display Recognition Result</h2>
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" id="imageInput" accept="image/*">
+            <br><br>
+            <button type="submit">Upload</button>
+        </form>
+        <div id="imageDisplay">
+            <!-- Uploaded image will be displayed here -->
+        </div>
+        <div class="result">
+            <textarea id="resultArea" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display server response
+                document.getElementById('resultArea').value = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            // Display uploaded image
+            var fileInput = document.getElementById('imageInput');
+            var file = fileInput.files[0];
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var img = document.createElement('img');
+                img.src = event.target.result;
+                document.getElementById('imageDisplay').innerHTML = '';
+                document.getElementById('imageDisplay').appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>
